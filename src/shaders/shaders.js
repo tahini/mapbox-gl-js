@@ -11,6 +11,8 @@ import backgroundPatternFrag from './background_pattern.fragment.glsl';
 import backgroundPatternVert from './background_pattern.vertex.glsl';
 import circleFrag from './circle.fragment.glsl';
 import circleVert from './circle.vertex.glsl';
+import circleSpinnerFrag from './circle_spinner.fragment.glsl';
+import circleSpinnerVert from './circle_spinner.vertex.glsl';
 import clippingMaskFrag from './clipping_mask.fragment.glsl';
 import clippingMaskVert from './clipping_mask.vertex.glsl';
 import heatmapFrag from './heatmap.fragment.glsl';
@@ -41,6 +43,8 @@ import hillshadeFrag from './hillshade.fragment.glsl';
 import hillshadeVert from './hillshade.vertex.glsl';
 import lineFrag from './line.fragment.glsl';
 import lineVert from './line.vertex.glsl';
+import lineArrowFrag from './line_arrow.fragment.glsl';
+import lineArrowVert from './line_arrow.vertex.glsl';
 import linePatternFrag from './line_pattern.fragment.glsl';
 import linePatternVert from './line_pattern.vertex.glsl';
 import rasterFrag from './raster.fragment.glsl';
@@ -127,6 +131,7 @@ export default {
     background: compile(backgroundFrag, backgroundVert),
     backgroundPattern: compile(backgroundPatternFrag, backgroundPatternVert),
     circle: compile(circleFrag, circleVert),
+    circleSpinner: compile(circleSpinnerFrag, circleSpinnerVert),
     clippingMask: compile(clippingMaskFrag, clippingMaskVert),
     heatmap: compile(heatmapFrag, heatmapVert),
     heatmapTexture: compile(heatmapTextureFrag, heatmapTextureVert),
@@ -142,6 +147,7 @@ export default {
     hillshadePrepare: compile(hillshadePrepareFrag, hillshadePrepareVert),
     hillshade: compile(hillshadeFrag, hillshadeVert),
     line: compile(lineFrag, lineVert),
+    lineArrow: compile(lineArrowFrag, lineArrowVert),
     linePattern: compile(linePatternFrag, linePatternVert),
     raster: compile(rasterFrag, rasterVert),
     symbolIcon: compile(symbolIconFrag, symbolIconVert),

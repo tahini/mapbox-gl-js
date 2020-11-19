@@ -27,7 +27,8 @@ export type LineUniformsType = {|
     'u_texsize': Uniform2f,
     'u_tile_units_to_pixels': Uniform1f,
     'u_alpha_discard_threshold': Uniform1f,
-    'u_trim_offset': Uniform2f
+    'u_trim_offset': Uniform2f,
+    'u_time': Uniform1f,
 |};
 
 export type LinePatternUniformsType = {|
@@ -54,7 +55,8 @@ const lineUniforms = (context: Context): LineUniformsType => ({
     'u_texsize': new Uniform2f(context),
     'u_tile_units_to_pixels': new Uniform1f(context),
     'u_alpha_discard_threshold': new Uniform1f(context),
-    'u_trim_offset': new Uniform2f(context)
+    'u_trim_offset': new Uniform2f(context),
+    'u_time': new Uniform1f(context, locations.u_time),
 });
 
 const linePatternUniforms = (context: Context): LinePatternUniformsType => ({
@@ -89,6 +91,7 @@ const lineUniformValues = (
         ],
         'u_dash_image': 0,
         'u_gradient_image': 1,
+        'u_time': (performance.now() / 1000) % 100000,
         'u_image_height': imageHeight,
         'u_texsize': hasDash(layer) ? tile.lineAtlasTexture.size : [0, 0],
         'u_tile_units_to_pixels': calculateTileRatio(tile, painter.transform),

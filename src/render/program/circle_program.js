@@ -24,6 +24,7 @@ export type CircleUniformsType = {|
     'u_extrude_scale': UniformMatrix2f,
     'u_device_pixel_ratio': Uniform1f,
     'u_matrix': UniformMatrix4f,
+    'u_time': Uniform1f,
     'u_inv_rot_matrix': UniformMatrix4f,
     'u_merc_center': Uniform2f,
     'u_tile_id': Uniform3f,
@@ -43,6 +44,7 @@ const circleUniforms = (context: Context): CircleUniformsType => ({
     'u_tile_id': new Uniform3f(context),
     'u_zoom_transition': new Uniform1f(context),
     'u_up_dir': new Uniform3f(context),
+    'u_time': new Uniform1f(context, locations.u_time),
 });
 
 const identityMatrix = mat4.create();
@@ -83,6 +85,7 @@ const circleUniformValues = (
             layer.paint.get('circle-translate-anchor')),
         'u_device_pixel_ratio': browser.devicePixelRatio,
         'u_extrude_scale': extrudeScale,
+        'u_time': (performance.now() / 1000) % 100000,
         'u_inv_rot_matrix': identityMatrix,
         'u_merc_center': [0, 0],
         'u_tile_id': [0, 0, 0],

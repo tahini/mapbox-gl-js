@@ -77,7 +77,7 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
         if (isGlobeProjection) {
             definesValues.push('PROJECTION_GLOBE_VIEW');
         }
-        const program = painter.useProgram('circle', programConfiguration, ((definesValues: any): DynamicDefinesType[]));
+        const program = painter.useProgram('circle', programConfiguration, ((definesValues: any): DynamicDefinesType[]), layer.customShader);
         const layoutVertexBuffer = bucket.layoutVertexBuffer;
         const globeExtVertexBuffer = bucket.globeExtVertexBuffer;
         const indexBuffer = bucket.indexBuffer;

@@ -874,7 +874,7 @@ class Painter {
         return defines;
     }
 
-    useProgram(name: string, programConfiguration: ?ProgramConfiguration, fixedDefines: ?DynamicDefinesType[]): Program<any> {
+    useProgram(name: string, programConfiguration: ?ProgramConfiguration, fixedDefines: ?DynamicDefinesType[], shaderName: ?string): Program<any> {
         this.cache = this.cache || {};
         const defines = (((fixedDefines || []): any): string[]);
 
@@ -883,7 +883,7 @@ class Painter {
         const key = Program.cacheKey(shaders[name], name, allDefines, programConfiguration);
 
         if (!this.cache[key]) {
-            this.cache[key] = new Program(this.context, name, shaders[name], programConfiguration, programUniforms[name], allDefines);
+            this.cache[key] = new Program(this.context, name, shaders[shaderName || name], programConfiguration, programUniforms[name], allDefines);
         }
         return this.cache[key];
     }

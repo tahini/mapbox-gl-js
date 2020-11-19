@@ -60,7 +60,7 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
         painter.prepareDrawTile();
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
-        const program = painter.useProgram(programId, programConfiguration, ((definesValues: any): DynamicDefinesType[]));
+        const program = painter.useProgram(programId, programConfiguration, ((definesValues: any): DynamicDefinesType[]), layer.customShader);
 
         const constantPattern = patternProperty.constantOr(null);
         if (constantPattern && tile.imageAtlas) {

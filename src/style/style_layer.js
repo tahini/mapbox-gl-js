@@ -43,6 +43,7 @@ class StyleLayer extends Evented {
     type: string;
     source: string;
     sourceLayer: ?string;
+    customShader: ?string;
     minzoom: ?number;
     maxzoom: ?number;
     filter: FilterSpecification | void;
@@ -91,6 +92,7 @@ class StyleLayer extends Evented {
         if (layer.type !== 'background' && layer.type !== 'sky') {
             this.source = layer.source;
             this.sourceLayer = layer['source-layer'];
+            this.customShader = layer['custom-shader'];
             this.filter = layer.filter;
         }
 
@@ -224,6 +226,7 @@ class StyleLayer extends Evented {
             'type': this.type,
             'source': this.source,
             'source-layer': this.sourceLayer,
+            'custom-shader': this.customShader,
             'metadata': this.metadata,
             'minzoom': this.minzoom,
             'maxzoom': this.maxzoom,
