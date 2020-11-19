@@ -56,7 +56,7 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
         const prevProgram = painter.context.program.get();
-        const program = painter.useProgram(programId, programConfiguration);
+        const program = painter.useProgram(programId, programConfiguration, layer.customShader);
         const programChanged = firstTile || program.program !== prevProgram;
 
         const constantPattern = patternProperty.constantOr(null);

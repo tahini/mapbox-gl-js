@@ -595,11 +595,11 @@ class Painter {
         return !imagePosA || !imagePosB;
     }
 
-    useProgram(name: string, programConfiguration: ?ProgramConfiguration): Program<any> {
+    useProgram(name: string, programConfiguration: ?ProgramConfiguration, shaderName: ?string): Program<any> {
         this.cache = this.cache || {};
         const key = `${name}${programConfiguration ? programConfiguration.cacheKey : ''}${this._showOverdrawInspector ? '/overdraw' : ''}`;
         if (!this.cache[key]) {
-            this.cache[key] = new Program(this.context, name, shaders[name], programConfiguration, programUniforms[name], this._showOverdrawInspector);
+            this.cache[key] = new Program(this.context, name, shaders[shaderName || name], programConfiguration, programUniforms[name], this._showOverdrawInspector);
         }
         return this.cache[key];
     }

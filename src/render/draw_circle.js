@@ -65,7 +65,7 @@ function drawCircles(painter: Painter, sourceCache: SourceCache, layer: CircleSt
         if (!bucket) continue;
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
-        const program = painter.useProgram('circle', programConfiguration);
+        const program = painter.useProgram('circle', programConfiguration, layer.customShader);
         const layoutVertexBuffer = bucket.layoutVertexBuffer;
         const indexBuffer = bucket.indexBuffer;
         const uniformValues = circleUniformValues(painter, coord, tile, layer);

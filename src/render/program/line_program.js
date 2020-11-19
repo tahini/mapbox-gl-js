@@ -58,14 +58,17 @@ export type LineSDFUniformsType = {|
     'u_image': Uniform1i,
     'u_tex_y_a': Uniform1f,
     'u_tex_y_b': Uniform1f,
-    'u_mix': Uniform1f
+    'u_mix': Uniform1f,
+    'u_time': Uniform1f,
 |};
 
 const lineUniforms = (context: Context, locations: UniformLocations): LineUniformsType => ({
     'u_matrix': new UniformMatrix4f(context, locations.u_matrix),
     'u_ratio': new Uniform1f(context, locations.u_ratio),
     'u_device_pixel_ratio': new Uniform1f(context, locations.u_device_pixel_ratio),
-    'u_units_to_pixels': new Uniform2f(context, locations.u_units_to_pixels)
+    'u_units_to_pixels': new Uniform2f(context, locations.u_units_to_pixels),
+    'u_time': new Uniform1f(context, locations.u_time),
+
 });
 
 const lineGradientUniforms = (context: Context, locations: UniformLocations): LineGradientUniformsType => ({
@@ -116,7 +119,8 @@ const lineUniformValues = (
         'u_units_to_pixels': [
             1 / transform.pixelsToGLUnits[0],
             1 / transform.pixelsToGLUnits[1]
-        ]
+        ],
+        'u_time': (performance.now() / 1000) % 100000,
     };
 };
 
