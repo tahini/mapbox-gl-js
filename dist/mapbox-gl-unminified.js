@@ -36286,7 +36286,7 @@ Painter.prototype.isPatternMissing = function isPatternMissing(image) {
 };
 Painter.prototype.useProgram = function useProgram(name, programConfiguration, shaderName) {
     this.cache = this.cache || {};
-    var key = '' + name + (programConfiguration ? programConfiguration.cacheKey : '') + (this._showOverdrawInspector ? '/overdraw' : '');
+    var key = '' + name + (shaderName ? shaderName : '') + (programConfiguration ? programConfiguration.cacheKey : '') + (this._showOverdrawInspector ? '/overdraw' : '');
     if (!this.cache[key]) {
         this.cache[key] = new Program$1(this.context, name, shaders[shaderName || name], programConfiguration, programUniforms[name], this._showOverdrawInspector);
     }
