@@ -597,7 +597,7 @@ class Painter {
 
     useProgram(name: string, programConfiguration: ?ProgramConfiguration, shaderName: ?string): Program<any> {
         this.cache = this.cache || {};
-        const key = `${name}${programConfiguration ? programConfiguration.cacheKey : ''}${this._showOverdrawInspector ? '/overdraw' : ''}`;
+        const key = `${name}${shaderName ? shaderName : ''}${programConfiguration ? programConfiguration.cacheKey : ''}${this._showOverdrawInspector ? '/overdraw' : ''}`;
         if (!this.cache[key]) {
             this.cache[key] = new Program(this.context, name, shaders[shaderName || name], programConfiguration, programUniforms[name], this._showOverdrawInspector);
         }
