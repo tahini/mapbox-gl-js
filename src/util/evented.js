@@ -1,6 +1,6 @@
 // @flow
 
-import {extend} from './util';
+import {extend} from './util.js';
 
 type Listener = (Object) => any;
 type Listeners = {[_: string]: Array<Listener> };
@@ -44,7 +44,11 @@ export class ErrorEvent extends Event {
 }
 
 /**
- * Methods mixed in to other classes for event capabilities.
+ * `Evented` mixes methods into other classes for event capabilities.
+ *
+ * Unless you are developing a plugin you will most likely use these methods through classes like `Map` or `Popup`.
+ *
+ * For lists of events you can listen for, see API documentation for specific classes: [`Map`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map-events), [`Marker`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map-events), [`Popup`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map-events), and [`GeolocationControl`](https://docs.mapbox.com/mapbox-gl-js/api/map/#map-events).
  *
  * @mixin Evented
  */
@@ -90,10 +94,15 @@ export class Evented {
      * The listener will be called first time the event fires after the listener is registered.
      *
      * @param {string} type The event type to listen for.
-     * @param {Function} listener The function to be called when the event is fired the first time.
-     * @returns {Object} `this`
+     * @param {Function} listener (optional) The function to be called when the event is fired once.
+     *   If not provided, returns a Promise that will be resolved when the event is fired once.
+     * @returns {Object} `this` | Promise
      */
-    once(type: *, listener: Listener) {
+    once(type: *, listener?: Listener): this | Promise<Event> {
+        if (!listener) {
+            return new Promise(resolve => this.once(type, resolve));
+        }
+
         this._oneTimeListeners = this._oneTimeListeners || {};
         _addEventListener(type, listener, this._oneTimeListeners);
 
@@ -144,14 +153,14 @@ export class Evented {
     }
 
     /**
-     * Returns a true if this instance of Evented or any forwardeed instances of Evented have a listener for the specified type.
+     * Returns true if this instance of Evented or any forwarded instances of Evented have a listener for the specified type.
      *
      * @param {string} type The event type
      * @returns {boolean} `true` if there is at least one registered listener for specified event type, `false` otherwise
      * @private
      */
     listens(type: string) {
-        return (
+        return !!(
             (this._listeners && this._listeners[type] && this._listeners[type].length > 0) ||
             (this._oneTimeListeners && this._oneTimeListeners[type] && this._oneTimeListeners[type].length > 0) ||
             (this._eventedParent && this._eventedParent.listens(type))

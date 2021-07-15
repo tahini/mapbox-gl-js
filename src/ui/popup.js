@@ -1,17 +1,17 @@
 // @flow
 
-import {extend, bindAll} from '../util/util';
-import {Event, Evented} from '../util/evented';
-import {MapMouseEvent} from '../ui/events';
-import DOM from '../util/dom';
-import LngLat from '../geo/lng_lat';
+import {extend, bindAll} from '../util/util.js';
+import {Event, Evented} from '../util/evented.js';
+import {MapMouseEvent} from '../ui/events.js';
+import DOM from '../util/dom.js';
+import LngLat from '../geo/lng_lat.js';
 import Point from '@mapbox/point-geometry';
-import window from '../util/window';
-import smartWrap from '../util/smart_wrap';
-import {type Anchor, anchorTranslate, applyAnchorClass} from './anchor';
+import window from '../util/window.js';
+import smartWrap from '../util/smart_wrap.js';
+import {type Anchor, anchorTranslate, applyAnchorClass} from './anchor.js';
 
-import type Map from './map';
-import type {LngLatLike} from '../geo/lng_lat';
+import type Map from './map.js';
+import type {LngLatLike} from '../geo/lng_lat.js';
 import type {PointLike} from '@mapbox/point-geometry';
 
 const defaultOptions = {
@@ -572,8 +572,12 @@ export default class Popup extends Evented {
         }
 
         const offsetedPos = pos.add(offset[anchor]).round();
-        DOM.setTransform(this._container, `${anchorTranslate[anchor]} translate(${offsetedPos.x}px,${offsetedPos.y}px)`);
-        applyAnchorClass(this._container, anchor, 'popup');
+        this._map._requestDomTask(() => {
+            if (this._container && anchor) {
+                DOM.setTransform(this._container, `${anchorTranslate[anchor]} translate(${offsetedPos.x}px,${offsetedPos.y}px)`);
+                applyAnchorClass(this._container, anchor, 'popup');
+            }
+        });
     }
 
     _focusFirstElement() {
@@ -586,6 +590,11 @@ export default class Popup extends Evented {
 
     _onClose() {
         this.remove();
+    }
+
+    _setOpacity(opacity: string) {
+        if (this._content) this._content.style.opacity = opacity;
+        if (this._tip)  this._tip.style.opacity = opacity;
     }
 }
 

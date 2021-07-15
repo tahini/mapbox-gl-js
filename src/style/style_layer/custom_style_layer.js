@@ -1,7 +1,7 @@
 // @flow
 
-import StyleLayer from '../style_layer';
-import type Map from '../../ui/map';
+import StyleLayer from '../style_layer.js';
+import type Map from '../../ui/map.js';
 import assert from 'assert';
 
 type CustomRenderMethod = (gl: WebGLRenderingContext, matrix: Array<number>) => void;
@@ -73,6 +73,8 @@ type CustomRenderMethod = (gl: WebGLRenderingContext, matrix: Array<number>) => 
  * map.on('load', function() {
  *     map.addLayer(new NullIslandLayer());
  * });
+ * @see [Add a custom style layer](https://docs.mapbox.com/mapbox-gl-js/example/custom-style-layer/)
+ * @see [Add a 3D model](https://docs.mapbox.com/mapbox-gl-js/example/add-3d-model/)
  */
 
 /**

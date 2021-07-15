@@ -1,17 +1,17 @@
 // @flow
 
-import DOM from '../util/dom';
-import window from '../util/window';
-import LngLat from '../geo/lng_lat';
+import DOM from '../util/dom.js';
+import window from '../util/window.js';
+import LngLat from '../geo/lng_lat.js';
 import Point from '@mapbox/point-geometry';
-import smartWrap from '../util/smart_wrap';
-import {bindAll, extend} from '../util/util';
-import {type Anchor, anchorTranslate, applyAnchorClass} from './anchor';
-import {Event, Evented} from '../util/evented';
-import type Map from './map';
-import type Popup from './popup';
-import type {LngLatLike} from "../geo/lng_lat";
-import type {MapMouseEvent, MapTouchEvent} from './events';
+import smartWrap from '../util/smart_wrap.js';
+import {bindAll, extend} from '../util/util.js';
+import {type Anchor, anchorTranslate, applyAnchorClass} from './anchor.js';
+import {Event, Evented} from '../util/evented.js';
+import type Map from './map.js';
+import type Popup from './popup.js';
+import type {LngLatLike} from "../geo/lng_lat.js";
+import type {MapMouseEvent, MapTouchEvent} from './events.js';
 import type {PointLike} from '@mapbox/point-geometry';
 
 type Options = {
@@ -26,6 +26,8 @@ type Options = {
     rotationAlignment?: string,
     pitchAlignment?: string
 };
+
+export const TERRAIN_OCCLUDED_OPACITY = 0.2;
 
 /**
  * Creates a marker component
@@ -76,6 +78,7 @@ export default class Marker extends Evented {
     _pitchAlignment: string;
     _rotationAlignment: string;
     _originalTabIndex: ?string; // original tabindex of _element
+    _fadeTimer: ?TimeoutID;
 
     constructor(options?: Options, legacyOptions?: Options) {
         super();
@@ -91,7 +94,8 @@ export default class Marker extends Evented {
             '_onUp',
             '_addDragHandler',
             '_onMapClick',
-            '_onKeyPress'
+            '_onKeyPress',
+            '_clearFadeTimer'
         ], this);
 
         this._anchor = options && options.anchor || 'center';
@@ -247,6 +251,8 @@ export default class Marker extends Evented {
         map.getCanvasContainer().appendChild(this._element);
         map.on('move', this._update);
         map.on('moveend', this._update);
+        map.on('remove', this._clearFadeTimer);
+        map._addMarker(this);
         this.setDraggable(this._draggable);
         this._update();
 
@@ -276,8 +282,11 @@ export default class Marker extends Evented {
             this._map.off('touchend', this._onUp);
             this._map.off('mousemove', this._onMove);
             this._map.off('touchmove', this._onMove);
+            this._map.off('remove', this._clearFadeTimer);
+            this._map._removeMarker(this);
             delete this._map;
         }
+        this._clearFadeTimer();
         DOM.remove(this._element);
         if (this._popup) this._popup.remove();
         return this;
@@ -439,6 +448,50 @@ export default class Marker extends Evented {
         return this;
     }
 
+    _evaluateOpacity() {
+        const position = this._pos ? this._pos.sub(this._transformedOffset()) : null;
+
+        if (!this._withinScreenBounds(position)) {
+            this._clearFadeTimer();
+            return;
+        }
+
+        const mapLocation = this._map.unproject(position);
+
+        let terrainOccluded = false;
+        if (this._map.getTerrain()) {
+            const camera = this._map.getFreeCameraOptions();
+            if (camera.position) {
+                const cameraPos = camera.position.toLngLat();
+                // the distance to the marker lat/lng + marker offset location
+                const offsetDistance = cameraPos.distanceTo(mapLocation);
+                const distance = cameraPos.distanceTo(this._lngLat);
+                terrainOccluded = offsetDistance < distance * 0.9;
+            }
+        }
+
+        const fogOpacity = this._map._queryFogOpacity(mapLocation);
+        const opacity = (1.0 - fogOpacity) * (terrainOccluded ? TERRAIN_OCCLUDED_OPACITY : 1.0);
+        this._element.style.opacity = `${opacity}`;
+        if (this._popup) this._popup._setOpacity(`${opacity}`);
+
+        this._fadeTimer = null;
+    }
+
+    _clearFadeTimer() {
+        if (this._fadeTimer) {
+            clearTimeout(this._fadeTimer);
+            this._fadeTimer = null;
+        }
+    }
+
+    _withinScreenBounds(position: ?Point): boolean {
+        const tr = this._map.transform;
+        return !!position &&
+            position.x >= 0 && position.x < tr.width &&
+            position.y >= 0 && position.y < tr.height;
+    }
+
     _update(e?: {type: 'move' | 'moveend'}) {
         if (!this._map) return;
 
@@ -446,7 +499,7 @@ export default class Marker extends Evented {
             this._lngLat = smartWrap(this._lngLat, this._pos, this._map.transform);
         }
 
-        this._pos = this._map.project(this._lngLat)._add(this._offset);
+        this._pos = this._map.project(this._lngLat)._add(this._transformedOffset());
 
         let rotation = "";
         if (this._rotationAlignment === "viewport" || this._rotationAlignment === "auto") {
@@ -469,7 +522,31 @@ export default class Marker extends Evented {
             this._pos = this._pos.round();
         }
 
-        DOM.setTransform(this._element, `${anchorTranslate[this._anchor]} translate(${this._pos.x}px, ${this._pos.y}px) ${pitch} ${rotation}`);
+        this._map._requestDomTask(() => {
+            if (!this._map) return;
+
+            if (this._element && this._pos && this._anchor) {
+                DOM.setTransform(this._element, `${anchorTranslate[this._anchor]} translate(${this._pos.x}px, ${this._pos.y}px) ${pitch} ${rotation}`);
+            }
+
+            if ((this._map.getTerrain() || this._map.getFog()) && !this._fadeTimer) {
+                this._fadeTimer = setTimeout(this._evaluateOpacity.bind(this), 60);
+            }
+        });
+    }
+
+    /**
+     * This is initially added to fix the behavior of default symbols only, in order
+     * to prevent any regression for custom symbols in client code.
+     * @private
+     */
+    _transformedOffset() {
+        if (!this._defaultMarker) return this._offset;
+        const tr = this._map.transform;
+        const offset = this._offset.mult(this._scale);
+        if (this._rotationAlignment === "map") offset._rotate(tr.angle);
+        if (this._pitchAlignment === "map") offset.y *= Math.cos(tr._pitch);
+        return offset;
     }
 
     /**
@@ -570,7 +647,7 @@ export default class Marker extends Evented {
             // to calculate the new marker position.
             // If we don't do this, the marker 'jumps' to the click position
             // creating a jarring UX effect.
-            this._positionDelta = e.point.sub(this._pos).add(this._offset);
+            this._positionDelta = e.point.sub(this._pos).add(this._transformedOffset());
 
             this._pointerdownPos = e.point;
 
