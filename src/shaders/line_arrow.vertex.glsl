@@ -42,6 +42,8 @@ void main() {
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
 
+    float linesofar = (floor(a_data.z / 4.0) + a_data.w * 64.0);
+
     vec2 pos = floor(a_pos_normal * 0.5);
 
     // x is 1 if it's a round cap, 0 otherwise
@@ -80,7 +82,7 @@ void main() {
     float extrude_length_with_perspective = length(projected_extrude.xy / gl_Position.w * u_units_to_pixels);
     v_gamma_scale = extrude_length_without_perspective / extrude_length_with_perspective;
 
-    v_linesofar = a_linesofar;  
+    v_linesofar = linesofar;  
 
     v_width2 = vec2(outset, inset);
 }
