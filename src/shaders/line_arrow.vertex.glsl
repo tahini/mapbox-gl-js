@@ -42,7 +42,7 @@ void main() {
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
 
-    float linesofar = (floor(a_data.z / 4.0) + a_data.w * 64.0);
+    float linesofar = (floor(a_data.z / 4.0) + a_linesofar * 64.0);
 
     vec2 pos = floor(a_pos_normal * 0.5);
 
