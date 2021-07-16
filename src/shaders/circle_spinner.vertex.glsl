@@ -4,7 +4,6 @@ uniform bool u_pitch_with_map;
 uniform vec2 u_extrude_scale;
 uniform lowp float u_device_pixel_ratio;
 uniform highp float u_camera_to_center_distance;
-uniform highp float u_time;
 
 attribute vec2 a_pos;
 
