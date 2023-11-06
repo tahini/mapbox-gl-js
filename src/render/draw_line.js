@@ -60,7 +60,6 @@ export default function drawLine(painter: Painter, sourceCache: SourceCache, lay
         painter.prepareDrawTile();
 
         const programConfiguration = bucket.programConfigurations.get(layer.id);
-        console.log('using custom shader', layer.customShader, layer)
         const program = painter.useProgram(programId, programConfiguration, ((definesValues: any): DynamicDefinesType[]), layer.customShader);
 
         const constantPattern = patternProperty.constantOr(null);
