@@ -56,7 +56,7 @@ const lineUniforms = (context: Context): LineUniformsType => ({
     'u_tile_units_to_pixels': new Uniform1f(context),
     'u_alpha_discard_threshold': new Uniform1f(context),
     'u_trim_offset': new Uniform2f(context),
-    'u_time': new Uniform1f(context, locations.u_time),
+    'u_time': new Uniform1f(context),
 });
 
 const linePatternUniforms = (context: Context): LinePatternUniformsType => ({

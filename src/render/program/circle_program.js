@@ -44,7 +44,7 @@ const circleUniforms = (context: Context): CircleUniformsType => ({
     'u_tile_id': new Uniform3f(context),
     'u_zoom_transition': new Uniform1f(context),
     'u_up_dir': new Uniform3f(context),
-    'u_time': new Uniform1f(context, locations.u_time),
+    'u_time': new Uniform1f(context),
 });
 
 const identityMatrix = mat4.create();
